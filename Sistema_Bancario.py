@@ -29,49 +29,43 @@ parte 2:
 
     listar contas correntes:
         listar todas as contas correntes cadastradas
-        
+
+parte 3:
+        utilizar classes para implementar o sistema bancário
+        criar métodos para cada funcionalidade        
 '''
 
-usuarios = [{'Nome': 'Fulano', 'CPF': '12345678900', 'Endereco': 'Fortaleza/CE'}]
-contas = []
+from classes import *
+
+usuarios = [Cliente('Ale', '123', 'we-6')]
 
 def criar_usuario():
-    '''
-    Recebe strings nome, cpf e endereco.
-    Adiciona um dicionário com esses valores na lista usuarios.
-    '''
-
-    nome = input('\nNome: ')
+    nome = input('\nNome: ').title()
     endereco = input('Endereço (Cidade/UF): ')
     cpf = input('CPF (apenas números): ')
 
     try:
         if not cpf.isdigit():
             raise Exception('CPF deve conter apenas números.')
-        if cpf in [usuario['CPF'] for usuario in usuarios]:
-            raise Exception('\nCPF já cadastrado.')
+        if cpf in [usuario.cpf for usuario in usuarios]:
+            raise Exception('CPF já cadastrado.')
     
     except Exception as e:
         print(f"\nNão foi posível cadastrar usuário.\nERRO: {e}")
         return None
     
     else:
-        usuarios.append({'Nome': nome, 'CPF': cpf, 'Endereco': endereco})
-        return print('\nUsuário cadastrado com sucesso.')
+        usuarios.append(Cliente(nome, cpf, endereco))
     
 
-def criar_conta_corrente():
-    '''
-    Adiciona um dicionário com agencia, conta e usuário na lista de contas.
-    '''
-
+def criar_conta():
     print("\nSelecione um usuário:")
-    lista_nomes = [usuario['Nome'].title() for usuario in usuarios]
-    print(*[f"({i}) {nome}" for i, nome in enumerate(lista_nomes)], sep='\n')
+    for i, usuario in enumerate(usuarios):
+        print(f"({i}) {usuario}")
 
     try:
         indice = int(input("\nOpção: "))
-        if indice not in range(len(lista_nomes)):
+        if indice not in range(len(usuarios)):
             raise Exception()
         
     except Exception:
@@ -79,56 +73,49 @@ def criar_conta_corrente():
         return None
 
     else:
-        contas.append({'Agencia': '0001', 'Conta': len(contas) + 1, 'Usuario': lista_nomes[indice], 'Saldo': 0, 'Extrato': '', 'Saques': 0})
-        return print('\nConta corrente criada com sucesso.')
+        usuarios[indice].criar_conta_corrente()
 
 
 def listar_contas_correntes():
-    '''
-    Lista todas as contas correntes cadastradas.
-    '''
-
-    print(f"\n{'USUÁRIO':37}AGENCIA-CONTA")
     for conta in contas:
-        print(f"{conta['Usuario']:43}{conta['Agencia']}-{conta['Conta']:02}")
+        print(conta)
 
 
 def selecionar_conta_corrente():
-    '''
-    Filtra as contas correntes pelo nome do usuário.
-    Seleciona a conta corrente pelo número.
-    '''
-
-    nome = input('\nBucar por nome do usuário: ').lower()
+    nome = input('\nBucar por nome do usuário: ').title()
     
-    if nome not in [conta['Usuario'].lower() for conta in contas]:
-        print('\nUsuário não possui conta corrente.')
+    if nome not in [usuario.nome for usuario in usuarios]:
+        print('\nUsuário não cadastrado.')
         return None
     
     else:
-        contas_usuario = [conta for conta in contas if conta['Usuario'].lower() == nome]
-        print('\nO usuário possui as seguintes contas corrente:')
-        print(*[f"{conta['Agencia']}-{conta['Conta']:02}" for conta in contas_usuario], sep='\n')
-
-        try:
-            cod_conta = int(input('\nDigite o número da conta corrente: 0001-'))
-            if cod_conta not in [int(conta['Conta']) for conta in contas_usuario]:
-                raise Exception()
-            
-        except Exception:
-            print('\nConta inválida.')
-            return None
+        for usuario in usuarios:
+            if usuario.nome == nome:
+                cliente = usuario
+                break
+        
+        if not cliente.contas:
+            print("O cliente não possui contas correntes.")
+            return False
 
         else:
-            return [conta for conta in contas if conta['Conta'] == cod_conta][0]
+            cliente.listar_contas()
+            
+            try:
+                cod_conta = input('\nSelecione a conta: ')
+                if not cod_conta.isdigit():
+                    raise Exception()
+                if int(cod_conta) < 0 or int(cod_conta) >= len(cliente.contas):
+                    raise Exception()
+
+            except Exception:
+                print('\nOpção inválida.')
+                
+            else:
+                return cliente.contas[int(cod_conta)]
 
 
-def deposito(conta:dict):
-    '''
-    Recebe um dicionário conta.
-    Adiciona um valor ao saldo da conta.
-    '''
-
+def deposito(conta):
     try:
         valor = float(input('\nValor do depósito: R$ ').replace(',', '.'))
     
@@ -138,21 +125,13 @@ def deposito(conta:dict):
         
     else:
         if valor > 0:
-            conta['Extrato'] += 'Depósito: {}{}\n'.format(' ' * (40 - len(f'R$ {valor:.2f}')), f'R$ {valor:.2f}')
-            print(f'\nDepósito de R$ {valor:.2f} realizado com sucesso.')
-            conta['Saldo'] += valor
+            conta.depositar(valor)
 
         else:
             print('\nValor inválido.')
 
 
 def saque(conta:dict):
-    '''
-    Recebe um dicionário conta.
-    Realiza um saque na conta.
-    Respeitando o limite diário de 3 saques diário e o valor máximo de 500 reais.
-    '''
-    
     try:
         valor = float(input('\nValor do saque: R$ ').replace(',', '.'))
     
@@ -161,27 +140,10 @@ def saque(conta:dict):
         return None
 
     else:
-        if valor > 500:
-            print('\nValor máximo por saque é de R$ 500.00')
-
-        elif valor > conta['Saldo']:
-            print('\nSaldo insuficiente.')
-            return None
-    
+        if valor > 0:
+            if conta.sacar(valor):
+                print('\nSaque realizado com sucesso.')
+            
         else:
-            conta['Extrato'] += 'Saque: {}{}\n'.format(' ' * (43 - len(f'R$ {valor:.2f}')), f'R$ {valor:.2f}')
-            print(f'\nSaque de R$ {valor:.2f} realizado com sucesso.')
-            conta['Saldo'] -= valor
-            conta['Saques'] += 1
-
-
-def mostrar_extrato(conta:dict):
-    '''
-    Recebe um dicionário conta.
-    Mostra o extrato da conta.
-    '''
-    
-    saldo = conta.get('Saldo')
-
-    print(conta['Extrato'])
-    print("Saldo: {}{}".format(' ' * (43 - len(f"R$ {saldo}")), f"R$ {saldo:.2f}"))
+            print('\nValor inválido.')
+   

@@ -36,7 +36,7 @@ while True:
         print("-" * 50)
         print("CRIAR CONTA CORRENTE".center(50))
         if usuarios:
-            criar_conta_corrente()
+            criar_conta()
             
         else:
             print('\nNão há usuários cadastrados.')
@@ -45,7 +45,7 @@ while True:
     
     elif opcao == '3':
         print('-' * 50)
-        print('LISTAR CONTAS CORRENTES'.center(50))
+        print('LISTAR CONTAS CORRENTES'.center(50), end='\n\n')
 
         if contas:
             listar_contas_correntes()
@@ -67,29 +67,25 @@ while True:
                 while True:
                     print("=" * 50)
                     print(f"CONTA CORRENTE".center(50))
-                    print(f"{conta['Usuario']:43}{conta['Agencia']}-{conta['Conta']:02}")
-                    print(f"Saldo: R$ {conta['Saldo']:.2f}")
+                    print(conta)
+                    print(f"Saldo: R$ {conta.saldo:.2f}")
                     opcao = input(menu_conta)
                     print("=" * 50)
                     
                     if opcao == '1':
                         print('-' * 50)
                         print('DEPÓSITO'.center(50))
-                        deposito(conta)
+                        if deposito(conta):
+                            print('\nDeposito realizado com sucesso.')
                         print('-' * 50)
                     
                     elif opcao == '2':
                         print('-' * 50)
                         print('SAQUE'.center(50))
 
-                        if conta['Saques'] == 3:
-                            print('Limite diário de saques atingido.\nVolte amanhã.')
-                            saques = 0
-
-                        elif conta['Saldo']:
-                            saque(conta)
-                            print(f"Saques diários restantes: {3 - conta['Saques']}")
-
+                        if conta.saldo:
+                            if saque(conta):
+                                print('\nSaque realizado com sucesoo.')
                         else:
                             print('\nSaldo insuficiente.')
 
@@ -99,11 +95,11 @@ while True:
                         print('-' * 50)
                         print('EXTRATO'.center(50))
 
-                        if conta['Extrato']:
-                            mostrar_extrato(conta)
-
+                        if conta.extrato:
+                            conta.mostrar_extrato()
+                        
                         else:
-                            print('Não foram realizadas movimentações.')
+                            print('\nNão houve movimentação na conta.')
 
                         print('-' * 50)
                     
