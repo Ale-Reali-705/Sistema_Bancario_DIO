@@ -29,6 +29,7 @@ parte 2:
 
     listar contas correntes:
         listar todas as contas correntes cadastradas
+        
 '''
 
 usuarios = [{'Nome': 'Fulano', 'CPF': '12345678900', 'Endereco': 'Fortaleza/CE'}]
