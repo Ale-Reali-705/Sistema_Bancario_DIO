@@ -37,7 +37,7 @@ parte 3:
 
 from classes import *
 
-usuarios = [Cliente('Ale', '123', 'we-6')]
+usuarios = []
 
 def criar_usuario():
     nome = input('\nNome: ').title()
@@ -55,7 +55,7 @@ def criar_usuario():
         return None
     
     else:
-        usuarios.append(Cliente(nome, cpf, endereco))
+        usuarios.append(Usuario(nome, cpf, endereco))
     
 
 def criar_conta():

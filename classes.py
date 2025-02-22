@@ -1,6 +1,6 @@
 contas = []
 
-class Cliente:
+class Usuario:
     def __init__(self, nome, cpf, endereco):
         self.nome = nome
         self.cpf = cpf
@@ -20,7 +20,7 @@ class Cliente:
     def listar_contas(self):
         print(f"Contas do cliente: {self.nome}")
         for i, conta in enumerate(self.contas):
-            print(f"({i}) - {conta}")
+            print(f"({i}) {conta}")
         
         
 
@@ -31,8 +31,6 @@ class Conta:
         self.agencia = '0001'
         self.conta = len(contas) + 1
         self.saldo = 0
-        self.saques = 0
-        self.saques_max = 0
         self.extrato = []
 
     def __str__(self):
@@ -50,7 +48,6 @@ class Conta:
     def sacar(self, valor):
         if self.saldo >= valor:
             self.saldo -= valor
-            self.saques -= 1
             self.extrato.append(f"Saque: R$ {valor:.2f}")
             return True
         else:
@@ -74,8 +71,11 @@ class ContaCorrente(Conta):
     def sacar(self, valor):
         if self.saques > 0:
             if valor <= self.saque_max:
-                self.saques -= 1
-                return super().sacar(valor)
+                if super().sacar(valor):
+                    self.saques -= 1
+                    return True
+                else:
+                    return False
             else:
                 print(f'Valor máximo por saque é de R$ {self.saque_max:.2f}')
                 return False

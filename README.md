@@ -25,3 +25,14 @@ O código é um desafio proprosto pela DIO como parte do curso "Suzano - Python 
   
 #### Selecionar conta  
   Seleciona, atraves do nome de usuário e o número da agencia-conta, qual será a conta/registro que utilizará as funções criadas na 1ª fase.
+
+## 3ª Fase
+### Foi implementado classes ao projeto:
+#### Classe Usuário
+  Possui nome, CPF e endero do usuário. Podendo criar contas correntes e listar as contas que o usuário possui.
+
+#### Classe Conta
+  Criada a partir de um usuário, contem o saldo e número da conta, além de servir de base para a Classe ContaCorrente. Possui funções básicas de deposito, saque e mostrar o extrado.
+
+#### Classe ContaCorrente
+  Adquire as funções da Classe Conta. É adicionádo a caractertísicas de limite de saque diário e valor máximo por saque, as quais são requisitos que são atribuídos à função sacar.
